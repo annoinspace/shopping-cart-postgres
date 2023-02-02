@@ -108,6 +108,25 @@ productsRouter.put("/:productId/category", async (req, res, next) => {
   }
 })
 
+// usersRouter.post("/:productId/reviews", async (req, res, next) => {
+//   try {
+//     const user = await UsersModel.findByPk(req.params.userId)
+//     if (user) {
+//       const review = await ReviewsModel.create(req.body)
+
+//       if (review) {
+//         const join = await UserReviewsModel.create({
+//           userId: req.params.userId,
+//           reviewId: review.reviewId
+//         })
+//       }
+//     }
+//     res.status(201).send(join)
+//   } catch (error) {
+//     next(error)
+//   }
+// })
+
 productsRouter.delete("/:productId", async (req, res, next) => {
   try {
     const numberOfDeletedRows = await ProductsModel.destroy({ where: { productId: req.params.productId } })
