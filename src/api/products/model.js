@@ -1,8 +1,10 @@
 import { DataTypes } from "sequelize"
 import sequelize from "../../db.js"
+import CategoriesModel from "../categories/model.js"
+import ProductsCategoriesModel from "./productsCategoriesModel.js"
 
 const ProductsModel = sequelize.define("product", {
-  id: {
+  productId: {
     type: DataTypes.UUID,
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4
@@ -19,14 +21,20 @@ const ProductsModel = sequelize.define("product", {
     type: DataTypes.DECIMAL(10, 1),
     allowNull: false
   },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   imageUrl: {
     type: DataTypes.STRING,
     allowNull: false
   }
+})
+
+// each product can belong to many categories and vice versa
+ProductsModel.belongsToMany(CategoriesModel, {
+  through: ProductsCategoriesModel,
+  foreignKey: { name: "productId", allowNull: false }
+})
+CategoriesModel.belongsToMany(ProductsModel, {
+  through: ProductsCategoriesModel,
+  foreignKey: { name: "categoryId", allowNull: false }
 })
 
 export default ProductsModel
