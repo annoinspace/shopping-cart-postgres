@@ -2,6 +2,7 @@ import { DataTypes } from "sequelize"
 import sequelize from "../../db.js"
 import CategoriesModel from "../categories/model.js"
 import ProductsCategoriesModel from "./productsCategoriesModel.js"
+import ReviewsModel from "../reviews/model.js"
 
 const ProductsModel = sequelize.define("product", {
   productId: {
@@ -26,6 +27,10 @@ const ProductsModel = sequelize.define("product", {
     allowNull: false
   }
 })
+
+// 1 to many relationship with reviews
+ProductsModel.hasMany(ReviewsModel, { foreignKey: { allowNull: false } })
+ReviewsModel.belongsTo(ProductsModel)
 
 // each product can belong to many categories and vice versa
 ProductsModel.belongsToMany(CategoriesModel, {

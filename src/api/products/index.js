@@ -3,27 +3,62 @@ import createHttpError from "http-errors"
 import { Op } from "sequelize"
 import ProductsModel from "./model.js"
 import ProductsCategoriesModel from "./productsCategoriesModel.js"
+import CategoriesModel from "../categories/model.js"
 
 const productsRouter = express.Router()
+// productsRouter.post("/", async (req, res, next) => {
+//   try {
+//     const { productId } = await ProductsModel.create(req.body)
+//     res.status(201).send({ productId })
+//   } catch (error) {
+//     next(error)
+//   }
+// })
+
 productsRouter.post("/", async (req, res, next) => {
   try {
     const { productId } = await ProductsModel.create(req.body)
-    res.status(201).send({ productId })
+
+    if (req.body.categories) {
+      await ProductsCategoriesModel.bulkCreate(
+        req.body.categories.map((category) => {
+          return {
+            categoryId: category,
+            productId
+          }
+        })
+      ) // --> [{categoryId: "asdasd", productId: "asdasdasdas"}]
+    }
+    res.status(201).send({ id: productId })
   } catch (error) {
     next(error)
   }
 })
 
+// productsRouter.get("/", async (req, res, next) => {
+//   try {
+//     const query = {}
+//     if (req.query.product_name) query.product_name = { [Op.iLike]: `${req.query.product_name}%` }
+
+//     if (req.query.price) query.price = { [Op.gte]: `${req.query.price}` }
+//     const products = await ProductsModel.findAll({
+//       where: { ...query }
+//       // attributes: ["productId", "product_name", "brand", "price", "imageUrl"]
+//     }) // (SELECT) pass an array for the include list
+//     res.send(products)
+//   } catch (error) {
+//     next(error)
+//   }
+// })
 productsRouter.get("/", async (req, res, next) => {
   try {
-    const query = {}
-    if (req.query.product_name) query.product_name = { [Op.iLike]: `${req.query.product_name}%` }
-
-    if (req.query.price) query.price = { [Op.gte]: `${req.query.price}` }
     const products = await ProductsModel.findAll({
-      where: { ...query }
-      // attributes: ["productId", "product_name", "brand", "price", "imageUrl"]
-    }) // (SELECT) pass an array for the include list
+      include: [
+        // { model: UsersModel, attributes: ["firstName", "lastName"] },
+        { model: CategoriesModel, attributes: ["name"], through: { attributes: [] } }
+        // to exclude from the result the junction table rows --> through: { attributes: [] }
+      ]
+    })
     res.send(products)
   } catch (error) {
     next(error)
@@ -63,11 +98,11 @@ productsRouter.put("/:productId", async (req, res, next) => {
 
 productsRouter.put("/:productId/category", async (req, res, next) => {
   try {
-    const { productId } = await ProductsCategoriesModel.create({
+    const join = await ProductsCategoriesModel.create({
       productId: req.params.productId,
       categoryId: req.body.categoryId
     })
-    res.status(201).send({ productId })
+    res.status(201).send(join)
   } catch (error) {
     next(error)
   }
