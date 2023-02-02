@@ -29,8 +29,8 @@ const ProductsModel = sequelize.define("product", {
 })
 
 // 1 to many relationship with reviews
-ProductsModel.hasMany(ReviewsModel, { foreignKey: { allowNull: false } })
-ReviewsModel.belongsTo(ProductsModel)
+// ProductsModel.hasMany(ReviewsModel, { foreignKey: { allowNull: false } })
+// ReviewsModel.belongsTo(ProductsModel)
 
 // each product can belong to many categories and vice versa
 ProductsModel.belongsToMany(CategoriesModel, {

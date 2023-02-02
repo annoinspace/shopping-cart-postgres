@@ -16,6 +16,39 @@ usersRouter.post("/", async (req, res, next) => {
   }
 })
 
+usersRouter.put("/:userId/reviews", async (req, res, next) => {
+  try {
+    const user = await UsersModel.findByPk(req.params.userId)
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" })
+    }
+    const review = await ReviewsModel.create({ ...req.body, userUserId: req.params.userId })
+    res.status(201).send({ message: "Review associated with user successfully" })
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+})
+// usersRouter.put("/:userId/reviews", async (req, res, next) => {
+//   try {
+//     const user = await UsersModel.findByPk(req.params.userId)
+//     if (user) {
+//       const review = await ReviewsModel.create(req.body)
+
+//       if (review) {
+//         const join = await UserReviewsModel.create({
+//           userId: req.params.userId,
+//           reviewId: review.reviewId
+//         })
+//       }
+//     }
+//     res.status(201).send(join)
+//   } catch (error) {
+//     next(error)
+//   }
+// })
+
 usersRouter.get("/", async (req, res, next) => {
   try {
     const query = {}
@@ -73,20 +106,6 @@ usersRouter.delete("/:userId", async (req, res, next) => {
   }
 })
 
-usersRouter.post("/:userId/reviews", async (req, res, next) => {
-  try {
-    const user = await UsersModel.findByPk(req.params.userId, {
-      include: {
-        model: ReviewsModel
-        // attributes: ["title"],
-        // where: { title: { [Op.iLike]: "%react%" } },
-      }
-    })
-    res.send(user)
-  } catch (error) {
-    next(error)
-  }
-})
 usersRouter.get("/:userId/reviews", async (req, res, next) => {
   try {
     const user = await UsersModel.findByPk(req.params.userId, {
